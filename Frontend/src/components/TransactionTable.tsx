@@ -15,12 +15,12 @@ import { Input } from './ui/input';
 import { deleteTransaction } from '../Services/api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import TransactionForm from './TransactionForm'; 
+import TransactionForm from './TransactionForm';
 
 export type Transaction = {
   id: string;
   amount: number;
-  type: 'income' | 'expense'; 
+  type: 'income' | 'expense';
   category: string;
   date: string;
   note: string;
@@ -29,7 +29,7 @@ export type Transaction = {
 type Props = {
   transactions: Transaction[];
   onDelete: () => void;
-  onUpdate?: () => void;  
+  onUpdate?: () => void;
 };
 
 const globalFilterFn = (row: any, columnId: string, filterValue: string) => {
@@ -56,8 +56,15 @@ const SortableHeader = ({ column, label }: { column: any; label: string }) => (
   </div>
 );
 
- 
-const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  children,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -85,7 +92,7 @@ const TransactionTable: React.FC<Props> = ({ transactions, onDelete, onUpdate })
 
   const handleEditSuccess = () => {
     setEditingTransaction(null);
-    onUpdate?.(); 
+    onUpdate?.();
   };
 
   const handleEditCancel = () => {
@@ -104,11 +111,13 @@ const TransactionTable: React.FC<Props> = ({ transactions, onDelete, onUpdate })
       header: ({ column }) => <SortableHeader column={column} label="Type" />,
       filterFn: globalFilterFn,
       cell: ({ row }) => (
-        <span className={`px-2 py-1 rounded text-xs font-medium ${
-          row.original.type === 'income' 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-red-100 text-red-800'
-        }`}>
+        <span
+          className={`px-2 py-1 rounded text-xs font-medium ${
+            row.original.type === 'income'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
+          }`}
+        >
           {row.original.type}
         </span>
       ),
@@ -133,16 +142,12 @@ const TransactionTable: React.FC<Props> = ({ transactions, onDelete, onUpdate })
       header: 'Actions',
       enableSorting: false,
       cell: ({ row }) => (
-        <div className="flex gap-2">
-          <Button
-            
-            onClick={() => setEditingTransaction(row.original)}
-          >
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => setEditingTransaction(row.original)}>
             Edit
           </Button>
           <Button
             variant="destructive"
-           
             onClick={async () => {
               try {
                 await deleteTransaction(row.original.id);
@@ -181,7 +186,7 @@ const TransactionTable: React.FC<Props> = ({ transactions, onDelete, onUpdate })
   });
 
   return (
-    <div>
+    <div className="w-full">
       <Input
         placeholder="Search..."
         value={globalFilter}
@@ -189,33 +194,41 @@ const TransactionTable: React.FC<Props> = ({ transactions, onDelete, onUpdate })
         className="mb-4"
       />
 
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          {table.getHeaderGroups().map((group) => (
-            <tr key={group.id}>
-              {group.headers.map((header) => (
-                <th key={header.id} className="p-2 border text-left">
-                  {flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-full border-collapse text-sm">
+          <thead>
+            {table.getHeaderGroups().map((group) => (
+              <tr key={group.id}>
+                {group.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="p-2 border text-left whitespace-nowrap bg-gray-100"
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
 
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="border hover:bg-gray-50">
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="p-2 border">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="border hover:bg-gray-50">
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className="p-2 border whitespace-nowrap text-gray-700"
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div className="flex items-center justify-between mt-4 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2 mt-4 text-sm">
         <Button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           Previous
         </Button>
